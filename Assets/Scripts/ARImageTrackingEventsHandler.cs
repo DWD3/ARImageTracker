@@ -6,16 +6,25 @@ using UnityEngine.XR.ARFoundation;
 public class ARImageTrackingEventsHandler : MonoBehaviour
 {
 
-    private ARTrackedImageManager _arTrackedImageManager;
+    [SerializeField] private ARTrackedImageManager _arTrackedImageManager;
 
     [SerializeField] private GameObject prefebToSpawnOnImage;
 
     private readonly Dictionary<String,GameObject>  _imageNameToCurrentPrefabObjDictionary =
         new Dictionary<string, GameObject>();
+    public Boolean IsUpdatingTrackedImage
+    {
+        get;
+        set;
+    }
     
     void Awake()
     {
-        _arTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
+        if (_arTrackedImageManager == null)
+        {
+            _arTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
+        }
+        
     }
     
 
@@ -31,6 +40,10 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
 
     private void OnTrackedImageChanged(ARTrackedImagesChangedEventArgs e)
     {
+        if (!IsUpdatingTrackedImage)
+        {
+            return;
+        }
         foreach (var imageAdded in e.added)
         {
             var imageTransform = imageAdded.transform;
@@ -50,7 +63,7 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
             prefabObjForImage.transform.position = imageTransform.position;
             prefabObjForImage.transform.rotation = imageTransform.rotation;
         }
-
+        
         foreach (var imageAdded in e.removed)
         {
             var imageName = imageAdded.referenceImage.name;
