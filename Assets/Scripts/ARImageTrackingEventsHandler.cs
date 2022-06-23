@@ -24,7 +24,9 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
         {
             _arTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
         }
-        
+
+        IsUpdatingTrackedImage = false;
+
     }
     
 
@@ -40,10 +42,6 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
 
     private void OnTrackedImageChanged(ARTrackedImagesChangedEventArgs e)
     {
-        if (!IsUpdatingTrackedImage)
-        {
-            return;
-        }
         foreach (var imageAdded in e.added)
         {
             var imageTransform = imageAdded.transform;
@@ -55,14 +53,18 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
             Debug.Log("Detected image " + imageName);
         }
         
-        foreach (var imageAdded in e.updated)
+        if (IsUpdatingTrackedImage)
         {
-            var imageName = imageAdded.referenceImage.name;
-            var imageTransform = imageAdded.transform;
-            var prefabObjForImage = _imageNameToCurrentPrefabObjDictionary[imageName];
-            prefabObjForImage.transform.position = imageTransform.position;
-            prefabObjForImage.transform.rotation = imageTransform.rotation;
+            foreach (var imageAdded in e.updated)
+            {
+                var imageName = imageAdded.referenceImage.name;
+                var imageTransform = imageAdded.transform;
+                var prefabObjForImage = _imageNameToCurrentPrefabObjDictionary[imageName];
+                prefabObjForImage.transform.position = imageTransform.position;
+                prefabObjForImage.transform.rotation = imageTransform.rotation;
+            };
         }
+
         
         foreach (var imageAdded in e.removed)
         {

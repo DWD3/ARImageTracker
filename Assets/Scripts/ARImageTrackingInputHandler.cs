@@ -7,29 +7,23 @@ using UnityEngine;
 public class ARImageTrackingInputHandler : MonoBehaviour
 {
     [SerializeField] private ARImageTrackingEventsHandler _arImageTrackingEventsHandler;
-    [SerializeField] private TMP_Text trackingStatusText;
-
-    private void Start()
-    {
-        AdjustTrackingStatusText(_arImageTrackingEventsHandler.IsUpdatingTrackedImage);
-    }
+    [SerializeField] private UIController _uiController;
 
     void Update()
     {
         if (WasTapped())
         {
             _arImageTrackingEventsHandler.IsUpdatingTrackedImage = !_arImageTrackingEventsHandler.IsUpdatingTrackedImage;
-            AdjustTrackingStatusText(_arImageTrackingEventsHandler.IsUpdatingTrackedImage);
+            _uiController.AdjustTrackingStatusText(_arImageTrackingEventsHandler.IsUpdatingTrackedImage);
         }
     }
 
-    private void AdjustTrackingStatusText(Boolean isTracking)
+    public void ToggleTrackingImageByImageNumber(int imageNumber)
     {
-        if (isTracking)
-            trackingStatusText.text = "Tracking";
-        else
-            trackingStatusText.text = "Not Tracking";
+        Debug.Log("Toggling for "+ imageNumber);
     }
+
+
     
     private bool WasTapped()
     {
