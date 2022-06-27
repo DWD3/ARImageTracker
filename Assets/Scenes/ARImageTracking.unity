@@ -168,7 +168,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a0e670d5811646045906fa2c72237739, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  trackingStatusText: {fileID: 1243945867}
+  trackingButtonText:
+  - {fileID: 843511381}
+  - {fileID: 1850359376}
+  - {fileID: 612516663}
+  - {fileID: 1689806431}
 --- !u!114 &55344882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -196,7 +200,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _arTrackedImageManager: {fileID: 508355648}
-  prefebToSpawnOnImage: {fileID: 9204185355570955611, guid: 42eac3fcbaa9e024497d54d409035f25, type: 3}
+  prefabToSpawnOnImage: {fileID: 9204185355570955611, guid: 42eac3fcbaa9e024497d54d409035f25, type: 3}
 --- !u!1 &276059906
 GameObject:
   m_ObjectHideFlags: 0

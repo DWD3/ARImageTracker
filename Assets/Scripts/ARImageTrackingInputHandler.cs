@@ -9,40 +9,18 @@ public class ARImageTrackingInputHandler : MonoBehaviour
     [SerializeField] private ARImageTrackingEventsHandler _arImageTrackingEventsHandler;
     [SerializeField] private UIController _uiController;
 
-    void Update()
-    {
-        if (WasTapped())
-        {
-            _arImageTrackingEventsHandler.IsUpdatingTrackedImage = !_arImageTrackingEventsHandler.IsUpdatingTrackedImage;
-            _uiController.AdjustTrackingStatusText(_arImageTrackingEventsHandler.IsUpdatingTrackedImage);
-        }
-    }
-
     public void ToggleTrackingImageByImageNumber(int imageNumber)
     {
-        Debug.Log("Toggling for "+ imageNumber);
+        _arImageTrackingEventsHandler.ToggleTrackingForImage("QR"+imageNumber);
+        if (_arImageTrackingEventsHandler.ImageNameToIsTrackingDict.ContainsKey("QR" + imageNumber))
+        {
+            _uiController.toggleButtonTextBasedOnTracking(imageNumber,
+                _arImageTrackingEventsHandler.ImageNameToIsTrackingDict["QR" + imageNumber]);
+        }
+        else
+            _uiController.toggleButtonTextBasedOnTracking(imageNumber,true);
+        
+
     }
-
-
     
-    private bool WasTapped()
-    {
-        if (Input.GetMouseButtonDown(0))
-        {
-            return true;
-        }
-
-        if (Input.touchCount == 0)
-        {
-            return false;
-        }
-
-        var touch = Input.GetTouch(0);
-        if (touch.phase != TouchPhase.Began)
-        {
-            return false;
-        }
-
-        return true;
-    }
 }

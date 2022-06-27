@@ -8,28 +8,29 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
 
     [SerializeField] private ARTrackedImageManager _arTrackedImageManager;
 
-    [SerializeField] private GameObject prefebToSpawnOnImage;
+    [SerializeField] private GameObject prefabToSpawnOnImage;
 
-    private readonly Dictionary<String,GameObject>  _imageNameToCurrentPrefabObjDictionary =
+    private readonly Dictionary<string,GameObject>  _imageNameToCurrentPrefabObjDictionary =
         new Dictionary<string, GameObject>();
-    public Boolean IsUpdatingTrackedImage
-    {
-        get;
-        set;
-    }
-    
-    void Awake()
+
+    public Dictionary<string, bool> ImageNameToIsTrackingDict { get; } = new Dictionary<string, bool>();
+
+    private void Awake()
     {
         if (_arTrackedImageManager == null)
         {
             _arTrackedImageManager = FindObjectOfType<ARTrackedImageManager>();
         }
 
-        IsUpdatingTrackedImage = false;
+        // //local testing purpose only
+        // ImageNameToIsTrackingDict["QR1"] = true;
+        // ImageNameToIsTrackingDict["QR2"] = true;
+        // ImageNameToIsTrackingDict["QR3"] = true;
+        // ImageNameToIsTrackingDict["QR4"] = true;
+
+
 
     }
-    
-
     public void OnEnable()
     {
         _arTrackedImageManager.trackedImagesChanged += OnTrackedImageChanged;
@@ -40,6 +41,12 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
         _arTrackedImageManager.trackedImagesChanged -= OnTrackedImageChanged;
     }
 
+    public void ToggleTrackingForImage(string imageName)
+    {
+        if(ImageNameToIsTrackingDict.ContainsKey(imageName))
+            ImageNameToIsTrackingDict[imageName] = !ImageNameToIsTrackingDict[imageName];
+    }
+
     private void OnTrackedImageChanged(ARTrackedImagesChangedEventArgs e)
     {
         foreach (var imageAdded in e.added)
@@ -47,24 +54,25 @@ public class ARImageTrackingEventsHandler : MonoBehaviour
             var imageTransform = imageAdded.transform;
             var imageName = imageAdded.referenceImage.name;
             _imageNameToCurrentPrefabObjDictionary.Add(imageName,
-                Instantiate(prefebToSpawnOnImage, imageTransform.position,imageTransform.rotation));
+                Instantiate(prefabToSpawnOnImage, imageTransform.position,imageTransform.rotation));
             var materialColor = _AssignColorToPrefabAccordingToImageName(imageName);
             _imageNameToCurrentPrefabObjDictionary[imageName].GetComponent<Renderer>().material.color = materialColor;
+            ImageNameToIsTrackingDict[imageName] = true;
             Debug.Log("Detected image " + imageName);
         }
         
-        if (IsUpdatingTrackedImage)
-        {
-            foreach (var imageAdded in e.updated)
-            {
-                var imageName = imageAdded.referenceImage.name;
-                var imageTransform = imageAdded.transform;
-                var prefabObjForImage = _imageNameToCurrentPrefabObjDictionary[imageName];
-                prefabObjForImage.transform.position = imageTransform.position;
-                prefabObjForImage.transform.rotation = imageTransform.rotation;
-            };
-        }
 
+        foreach (var imageAdded in e.updated)
+        {
+            var imageName = imageAdded.referenceImage.name;
+            if(!ImageNameToIsTrackingDict.ContainsKey(imageName) ||
+               !ImageNameToIsTrackingDict[imageName])
+                continue;
+            var imageTransform = imageAdded.transform;
+            var prefabObjForImage = _imageNameToCurrentPrefabObjDictionary[imageName];
+            prefabObjForImage.transform.position = imageTransform.position;
+            prefabObjForImage.transform.rotation = imageTransform.rotation;
+        };
         
         foreach (var imageAdded in e.removed)
         {
